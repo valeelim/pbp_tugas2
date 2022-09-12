@@ -1,0 +1,23 @@
+table,td,th {
+    border: 1px solid;
+}
+
+th {
+    padding: 10px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+.checked {
+    color: orange;
+}
+
+table tr {
+    text-align: left;
+}
+
+tr:first-child {
+    text-align: center;
+}
