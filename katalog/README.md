@@ -1,4 +1,5 @@
 # Katalog
+Site dapat diakses [disini](https://vl-pbp-tugas2.herokuapp.com/katalog/)
 
 ## Bagan 
 ---
