@@ -33,17 +33,4 @@
   {% endfor %}
 </table>
 
-<script>
-  document.querySelectorAll('.rating').forEach(rating => {
-    let howmany = rating.innerHTML
-    rating.innerHTML = ''
-    for (let i = 0; i < 5; i++){
-      const star = document.createElement('span')
-      star.classList.add('fa', 'fa-star')
-      if (i < howmany) star.classList.add('checked')
-      rating.appendChild(star)
-    }
-  })
-</script>
-
 {% endblock content %}

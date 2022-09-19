@@ -1,0 +1,112 @@
+[
+    {
+        "model": "mywatchlist.mywatchlist",
+        "pk": 1,
+        "fields": {
+            "watched": true,
+            "title": "Nevertheless",
+            "rating": 4,
+            "release_date": "2021-06-19",
+            "review": "Amazing soundtrack, good looking casts :3, weird yet enjoyable plot"
+        }
+    },
+    {
+        "model": "mywatchlist.mywatchlist",
+        "pk": 2,
+        "fields": {
+            "watched": false,
+            "title": "50 Shades of Gray",
+            "rating": 1,
+            "release_date": "2015-02-13",
+            "review": "...."
+        }
+    },
+    {
+        "model": "mywatchlist.mywatchlist",
+        "pk": 3,
+        "fields": {
+            "watched": true,
+            "title": "Komi Can't Communicate",
+            "rating": 5,
+            "release_date": "2021-10-07",
+            "review": "Wholesome++++++++++++"
+        }
+    },
+    {
+        "model": "mywatchlist.mywatchlist",
+        "pk": 4,
+        "fields": {
+            "watched": false,
+            "title": "Kaguya-sama wa Kokurasetai",
+            "rating": 5,
+            "release_date": "2019-01-12",
+            "review": "Kaguya uwu #vvibu"
+        }
+    },
+    {
+        "model": "mywatchlist.mywatchlist",
+        "pk": 5,
+        "fields": {
+            "watched": false,
+            "title": "FRIEND ZONE",
+            "rating": 3,
+            "release_date": "2019-03-20",
+            "review": "Too close to home:')"
+        }
+    },
+    {
+        "model": "mywatchlist.mywatchlist",
+        "pk": 6,
+        "fields": {
+            "watched": false,
+            "title": "Twilight",
+            "rating": 2,
+            "release_date": "2008-12-03",
+            "review": "???????"
+        }
+    },
+    {
+        "model": "mywatchlist.mywatchlist",
+        "pk": 7,
+        "fields": {
+            "watched": true,
+            "title": "Hachi: A Dog's Tale",
+            "rating": 5,
+            "release_date": "2010-03-16",
+            "review": "KJASODIJFIOPASJDFKJASKL;DFJP :'((((((((("
+        }
+    },
+    {
+        "model": "mywatchlist.mywatchlist",
+        "pk": 8,
+        "fields": {
+            "watched": true,
+            "title": "Spy x Family",
+            "rating": 5,
+            "release_date": "2022-04-09",
+            "review": "Waku Waku"
+        }
+    },
+    {
+        "model": "mywatchlist.mywatchlist",
+        "pk": 9,
+        "fields": {
+            "watched": false,
+            "title": "Train to Busan",
+            "rating": 4,
+            "release_date": "2016-07-20",
+            "review": "Blame my fam for spoiling too much :V"
+        }
+    },
+    {
+        "model": "mywatchlist.mywatchlist",
+        "pk": 10,
+        "fields": {
+            "watched": true,
+            "title": "Extraction",
+            "rating": 5,
+            "release_date": "2020-04-24",
+            "review": "Intense much"
+        }
+    }
+]
