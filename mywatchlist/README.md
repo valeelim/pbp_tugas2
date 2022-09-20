@@ -40,7 +40,7 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 - At this point, I want to add some data to my database. To do that, I made a new file named `initial_mywatchlist_data.json` inside a brand new folder `mywatchlist/fixtures`. After creating a few seed data, all I had to do was load that data.
-```python
+```json
 [
     ...
     {
