@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block meta %}
+<title>Tasks</title>
+{% endblock meta %}
+
+{% block content %}
+
+{% include 'partials/navbar.html' with username=username %}
+
+<div class="container mt-3">
+    <div class="accordion" id="accordionExample">
+        {% if task_list|length < 1%} <h1 class="text-center">Create a new task :D</h1>
+            {% endif %}
+            {% for task in task_list %}
+            <div class="accordion-item mb-3 w-100">
+                <h4 class="accordion-header flex-grow-1">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#task{{ task.id }}" aria-expanded="true" aria-controls="{{ task.id }}">
+                        {{ task.title }}
+                        {% if task.is_finished %}
+                        <span class="ms-3 badge text-bg-success" style="font-size: 10px">
+                            completed
+                        </span>
+                        {% endif %}
+                    </button>
+                </h4>
+                <div id="task{{ task.id }}" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <p>{{ task.description }} </p>
+                        <hr>
+                        <form class="d-inline" action="{% url 'todolist:finish_task' task.id %}" method="POST">
+                            {% csrf_token %}
+                            <button id="toggleTask" type="submit"
+                                class="btn {% if task.is_finished %} btn-warning {% else %} btn-primary {% endif %}">
+                                {% if task.is_finished %}
+                                Cancel
+                                {% else %}
+                                Finish
+                                {% endif %}
+                            </button>
+                        </form>
+                        <form class="d-inline me-auto" action="{% url 'todolist:delete_task' task.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                        <span style="float: right">{{ task.date }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+    </div>
+</div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'todolist:create_task' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label" for="title">New Task</label>
+                        <input class="form-control" type="text" name="title" placeholder="Selfie with puppy">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label" for="description">Description</label>
+                        <textarea class="form-control" name="description" rows="5"
+                            placeholder="Remember to smile!"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock content %}

@@ -41,9 +41,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'fontawesomefree',
     'example_app',
     'katalog',
     'mywatchlist',
+    'todolist',
 ]
 
 MIDDLEWARE = [
