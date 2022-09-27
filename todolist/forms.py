@@ -43,3 +43,17 @@ class RegisterForm(UserCreationForm):
         model = User
         fields = ('username', 'email', 'password1', 'password2',)
 
+    def clean(self):
+        super(RegisterForm, self).clean()
+        username = self.cleaned_data.get('username')
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        
+        if password1 != password2:
+            self._errors['password2'] = self.error_class(['Password mismatch'])
+        if len(password1) < 8:
+            self._errors['password1'] = self.error_class(['Password length must be at least 8 characters'])
+        if len(username) < 4:
+            self._errors['username'] = self.error_class(['Username must be at least 4 characters'])
+
+        return self.cleaned_data

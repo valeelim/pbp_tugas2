@@ -62,12 +62,11 @@ def register(request):
     form = RegisterForm()
     if request.method == 'POST':
         form = RegisterForm(request.POST)
-        print(form)
         if form.is_valid():
             form.save()
             return redirect('todolist:login')
         else:
-            form = RegisterForm()
+            return render(request, 'register.html', {'form': form})
     context = {'form': form}
     return render(request, 'register.html', context)
 
@@ -84,7 +83,7 @@ def login_user(request):
             response.set_cookie('username', username)
             return response
         else:
-            messages.info(request, 'Username or password incorrect')
+            return render(request, 'login.html', {'notFound': True})
     return render(request, 'login.html', {})
 
 
