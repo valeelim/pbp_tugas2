@@ -4,7 +4,6 @@ from django.urls import reverse
 from django.shortcuts import redirect, render
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib import messages
 from django.views import generic
 from .forms import RegisterForm
 from .models import Task
@@ -12,7 +11,7 @@ from .models import Task
 
 class IndexView(LoginRequiredMixin, generic.ListView):
     template_name = 'todolist.html'
-    login_url = 'login/'
+    login_url = 'todolist:login'
     context_object_name = 'task_list'
 
     def get_queryset(self):
@@ -27,6 +26,7 @@ class IndexView(LoginRequiredMixin, generic.ListView):
             context['task_list'] = Task.objects.filter(user=self.request.user)
         except Task.DoesNotExist:
             context['task_list'] = None
+        print(self.request.user)
         context.update({
             'username': self.request.COOKIES['username'],
             'last_login': self.request.COOKIES['last_login'],
@@ -79,8 +79,8 @@ def login_user(request):
         if user is not None:
             login(request, user)
             response = HttpResponseRedirect(reverse('todolist:show_todolist'))
-            response.set_cookie('last_login', str(datetime.datetime.now()))
-            response.set_cookie('username', username)
+            response.set_cookie('last_login', str(datetime.datetime.now()), max_age=60*60*24*14)
+            response.set_cookie('username', username, max_age=60*60*24*14)
             return response
         else:
             return render(request, 'login.html', {'notFound': True})
@@ -89,4 +89,7 @@ def login_user(request):
 
 def logout_user(request):
     logout(request)
-    return redirect('todolist:login')
+    response = HttpResponseRedirect(reverse('todolist:login'))
+    response.delete_cookie('last_login')
+    response.delete_cookie('username')
+    return response
