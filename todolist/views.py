@@ -26,10 +26,8 @@ class IndexView(LoginRequiredMixin, generic.ListView):
             context['task_list'] = Task.objects.filter(user=self.request.user)
         except Task.DoesNotExist:
             context['task_list'] = None
-        print(self.request.user)
         context.update({
-            'username': self.request.COOKIES['username'],
-            'last_login': self.request.COOKIES['last_login'],
+            'username': self.request.user,
         })
         return context
 
@@ -45,10 +43,12 @@ def create_task(request):
         return HttpResponseRedirect(reverse('todolist:show_todolist'))
     return render(request, 'todolist.html', {})
 
+
 def delete_task(request, task_id):
     if request.method == 'POST':
         Task.objects.get(pk=task_id).delete()
         return HttpResponseRedirect(reverse('todolist:show_todolist'))
+
 
 def finish_task(request, task_id):
     if request.method == 'POST':
@@ -79,7 +79,8 @@ def login_user(request):
         if user is not None:
             login(request, user)
             response = HttpResponseRedirect(reverse('todolist:show_todolist'))
-            response.set_cookie('last_login', str(datetime.datetime.now()), max_age=60*60*24*14)
+            response.set_cookie('last_login', str(
+                datetime.datetime.now()), max_age=60*60*24*14)
             response.set_cookie('username', username, max_age=60*60*24*14)
             return response
         else:
