@@ -6,16 +6,16 @@
 
 {% block content %}
 
+<div id="background-wave"></div>
 {% include 'partials/navbar.html' with username=username %}
-
-<div class="container mt-3">
-    <div class="accordion" id="accordionExample">
+<div class="container mt-5 d-flex flex-column align-items-center">
+    <div class="accordion w-75" id="accordionExample">
         {% if task_list|length < 1%} <h1 class="text-center">Create a new task :D</h1>
             {% endif %}
             {% for task in task_list %}
             <div class="accordion-item mb-3 w-100">
-                <h4 class="accordion-header flex-grow-1">
-                    <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                <h4 class="accordion-header flex-grow-1" style="height: 65px">
+                    <button class="accordion-button h-100 fw-normal" type="button" data-bs-toggle="collapse"
                         data-bs-target="#task{{ task.id }}" aria-expanded="true" aria-controls="{{ task.id }}">
                         {{ task.title }}
                         {% if task.is_finished %}
@@ -51,24 +51,23 @@
             {% endfor %}
     </div>
 </div>
-</div>
 
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Create New Task</h5>
+                <h5 class="modal-title text-black" id="exampleModalLabel">Create New Task</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{% url 'todolist:create_task' %}" method="POST">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label" for="title">New Task</label>
+                        <label class="form-label text-black" for="title">New Task</label>
                         <input class="form-control" type="text" name="title" placeholder="Selfie with puppy">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label" for="description">Description</label>
+                        <label class="form-label text-black" for="description">Description</label>
                         <textarea class="form-control" name="description" rows="5"
                             placeholder="Remember to smile!"></textarea>
                     </div>
@@ -81,6 +80,17 @@
         </div>
     </div>
 </div>
-</div>
+
+<style>
+    .accordion-button {
+        font-size: 1.5rem;
+    }
+    .accordion-button:hover {
+        background-color: rgba(255, 255, 255, 0.5);
+    }
+    .accordion-button:not(.collapsed) {
+        color: black;
+    }
+</style>
 
 {% endblock content %}

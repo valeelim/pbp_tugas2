@@ -1,3 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+body {
+    background-color: #001220;
+}
+
+nav {
+    font-family: 'Fredoka One', cursive;
+    color: white;
+}
+
 table,td,th {
     border: 1px solid;
 }
@@ -20,4 +31,12 @@ table tr {
 
 tr:first-child {
     text-align: center;
+}
+
+.navbar-brand {
+    font-family: 'Fredoka One', cursive;
+}
+
+.input-group-x {
+    font-size: 1.4rem;
 }
