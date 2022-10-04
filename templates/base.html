@@ -10,6 +10,12 @@
     integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
   <script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
   <link href="{% static 'fontawesomefree/css/all.min.css' %}" rel="stylesheet" type="text/css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.2/gsap.min.js"
+  integrity="sha512-gsEItzcNkWxfxHjr4BaEZAd9YuRWYjxnj7c/yukcZ0/nWehUb5TjJNyyv1ApCU2DFH/qgw+stFZHPOKnoQnIuQ=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.2/ScrollTrigger.min.js"
+  integrity="sha512-ko44b+LlYXwGZI6Gey6Tgrhew9JEPdSE6m7FqDyGGPDW+dDOjsCElEtiUIRRtCXRNHwKheBCnHCQSMdUz/pgkw=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <link rel="stylesheet" href="{% static 'css/style.css' %}" type="text/css">
 
   {% block meta %}
@@ -20,12 +26,16 @@
   {% block content %}
   {% endblock content %}
 </body>
-<script src="{% static 'js/star_rating.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
   integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" crossorigin="anonymous"></script>
+<script src="{% static 'js/star_rating.js' %}"></script>
+
 
 </html>
 <style>
+  body {
+    overflow-x: hidden;
+  }
   #background-wave {
     position: absolute;
     /* aspect-ratio: 16/9; */

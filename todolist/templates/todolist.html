@@ -2,6 +2,8 @@
 
 {% block meta %}
 <title>Tasks</title>
+
+
 {% endblock meta %}
 
 {% block content %}
@@ -14,7 +16,7 @@
             {% endif %}
             {% for task in task_list %}
             <div class="accordion-item mb-3 w-100">
-                <h4 class="accordion-header flex-grow-1" style="height: 65px">
+                <h4 class="accordion-header flex-grow-1" style="height: 80px">
                     <button class="accordion-button h-100 fw-normal" type="button" data-bs-toggle="collapse"
                         data-bs-target="#task{{ task.id }}" aria-expanded="true" aria-controls="{{ task.id }}">
                         {{ task.title }}
@@ -82,15 +84,42 @@
 </div>
 
 <style>
+    .accordion-item {
+        box-shadow: 5px 5px 7px rgba(255, 255, 255, 0.2);
+    }
     .accordion-button {
         font-size: 1.5rem;
     }
+
     .accordion-button:hover {
         background-color: rgba(255, 255, 255, 0.5);
     }
+
     .accordion-button:not(.collapsed) {
         color: black;
     }
 </style>
+
+<script>
+    gsap.registerPlugin(ScrollTrigger);
+    
+    gsap.utils.toArray('.accordion-item').forEach(item => {
+        item.addEventListener('shown.bs.collapse', () => ScrollTrigger.refresh());
+        item.addEventListener('hidden.bs.collapse', () => ScrollTrigger.refresh());
+        gsap.from(item, {
+            opacity: 0,
+            yPercent: -100,
+            duration: 0.5,
+            stagger: {
+                each: 0.2
+            },
+            scrollTrigger: {
+                start: 'bottom bottom',
+                trigger: item,
+                toggleActions: "restart reverse restart reverse",
+            },
+        })
+    })
+</script>
 
 {% endblock content %}
