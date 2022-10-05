@@ -49,4 +49,7 @@ body {
 - `::before`, gives content before the referenced element
 - and more ...
 
+# Implementation
+
+First I imported bootstrap to use some of their components and then expand as well as customize them later on. To import boostrap, I just needed to include the CDN they provide to my `base.html` and that's it. I used accordions instead of cards for this one, and then I used GSAP to give a staggering effect everytime you scroll through each accordion. For the media query, I only used it for the navbar. If it gets too small, without media query, the nav-items are not centered, so I used flex to center them.
 
