@@ -1,7 +1,8 @@
 import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.urls import reverse
 from django.shortcuts import redirect, render
+from django.core import serializers
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import generic
@@ -31,16 +32,25 @@ class IndexView(LoginRequiredMixin, generic.ListView):
         })
         return context
 
+def show_json(request):
+    data = Task.objects.all()
+    return HttpResponse(serializers.serialize('json', data), content_type='application/json')
 
 def create_task(request):
     if request.method == 'POST':
-        Task.objects.create(
+        newTask = Task(
             user=request.user,
             date=datetime.datetime.now(),
             title=request.POST.get('title'),
             description=request.POST.get('description'),
         )
-        return HttpResponseRedirect(reverse('todolist:show_todolist'))
+        newTask.save()
+        return JsonResponse({
+            'pk': newTask.pk,
+            'title': newTask.title,
+            'description': newTask.description,
+            'date': newTask.date
+        })
     return render(request, 'todolist.html', {})
 
 

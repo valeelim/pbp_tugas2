@@ -13,44 +13,7 @@
 <div class="container mt-5 d-flex flex-column align-items-center">
     <div class="accordion w-75" id="accordionExample">
         {% if task_list|length < 1%} <h1 class="text-center">Create a new task :D</h1>
-            {% endif %}
-            {% for task in task_list %}
-            <div class="accordion-item mb-3 w-100">
-                <h4 class="accordion-header flex-grow-1" style="height: 80px">
-                    <button class="accordion-button h-100 fw-normal" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#task{{ task.id }}" aria-expanded="true" aria-controls="{{ task.id }}">
-                        {{ task.title }}
-                        {% if task.is_finished %}
-                        <span class="ms-3 badge text-bg-success" style="font-size: 10px">
-                            completed
-                        </span>
-                        {% endif %}
-                    </button>
-                </h4>
-                <div id="task{{ task.id }}" class="accordion-collapse collapse">
-                    <div class="accordion-body">
-                        <p>{{ task.description }} </p>
-                        <hr>
-                        <form class="d-inline" action="{% url 'todolist:finish_task' task.id %}" method="POST">
-                            {% csrf_token %}
-                            <button id="toggleTask" type="submit"
-                                class="btn {% if task.is_finished %} btn-warning {% else %} btn-primary {% endif %}">
-                                {% if task.is_finished %}
-                                Cancel
-                                {% else %}
-                                Finish
-                                {% endif %}
-                            </button>
-                        </form>
-                        <form class="d-inline me-auto" action="{% url 'todolist:delete_task' task.id %}" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Delete</button>
-                        </form>
-                        <span style="float: right">{{ task.date }}</span>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
+        {% endif %}
     </div>
 </div>
 
@@ -61,7 +24,7 @@
                 <h5 class="modal-title text-black" id="exampleModalLabel">Create New Task</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{% url 'todolist:create_task' %}" method="POST">
+            <form id="addForm" action="{% url 'todolist:add_task' %}" method="POST">
                 {% csrf_token %}
                 <div class="modal-body">
                     <div class="mb-3">
@@ -87,6 +50,7 @@
     .accordion-item {
         box-shadow: 5px 5px 7px rgba(255, 255, 255, 0.2);
     }
+
     .accordion-button {
         font-size: 1.5rem;
     }
@@ -94,36 +58,148 @@
     /* .accordion-button:hover {
         background-color: rgba(255, 255, 255, 0.5);
     } */
-    .accordion-item:hover, .accordion-button:hover {
+    .accordion-item:hover,
+    .accordion-button:hover {
         transform: scale(1.02);
-        transition: transform .1s ease;
+        transition: transform .2s ease;
     }
 
     .accordion-button:not(.collapsed) {
         color: black;
     }
+    .accordion-title {
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: calc(80%);
+    }
 </style>
 
 <script>
     gsap.registerPlugin(ScrollTrigger);
-    
-    gsap.utils.toArray('.accordion-item').forEach(item => {
-        item.addEventListener('shown.bs.collapse', () => ScrollTrigger.refresh());
-        item.addEventListener('hidden.bs.collapse', () => ScrollTrigger.refresh());
-        gsap.from(item, {
-            opacity: 0,
-            yPercent: -100,
-            duration: 0.5,
-            stagger: {
-                each: 0.2
-            },
-            scrollTrigger: {
-                start: 'bottom bottom',
-                trigger: item,
-                toggleActions: "restart reverse restart reverse",
-            },
+
+    const accordion = document.querySelector('#accordionExample');
+    $(document).ready(() => {
+        $.get("{% url 'todolist:show_json' %}", data => {
+            data.forEach(task => {
+                $(accordion).append(`
+                    <div id="accordion${task.pk}" class="accordion-item mb-3 w-100">
+                        <h4 class="d-flex justify-content-center accordion-header flex-grow-1" style="height: 80px">
+                            <button class="accordion-button h-100 fw-normal" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#task${task.pk}" aria-expanded="true" aria-controls="${task.pk}">
+                                <span class="accordion-title">${task.fields.title}</span>
+                                ${task.fields.is_finished ? '<span class="ms-3 badge text-bg-success" style="font-size: 10px">completed</span>' : ''}
+                            </button>
+                        </h4>
+                        <div id="task${task.pk}" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <p>${task.fields.description}</p>
+                                <hr>
+                                <form class="d-inline" action="${task.pk}/finish-task/" method="POST">
+                                    {% csrf_token %}
+                                    <button id="toggleTask" type="submit"
+                                        class="btn ${task.fields.is_finished ? 'btn-warning' : 'btn-primary'}">
+                                        ${task.fields.is_finished ? 'Cancel' : 'Finish'}
+                                    </button>
+                                </form>
+                                <form class="d-inline me-auto" action="${task.pk}/delete_task/" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                                <span style="float: right">${task.fields.date}</span>
+                            </div>
+                        </div>
+                    </div>
+                `)
+                let item = $(`#accordion${task.pk}`)[0]
+                item.addEventListener('shown.bs.collapse', () => ScrollTrigger.refresh());
+                item.addEventListener('hidden.bs.collapse', () => ScrollTrigger.refresh());
+                gsap.fromTo(item, {
+                    opacity: 0,
+                    yPercent: -100,
+                }, {
+                    opacity: 1,
+                    yPercent: 0,
+                    duration: 0.5,
+                    stagger: {
+                        each: 0.2
+                    },
+                    scrollTrigger: {
+                        start: 'bottom bottom',
+                        trigger: item,
+                        toggleActions: "restart reverse restart reverse",
+                    },
+                })
+            })
         })
     })
+
+    $('#addForm').submit(function(e) {
+        e.preventDefault()
+
+        let form = $(this)
+        let actionUrl = form.attr('action')
+
+        $.ajax({
+            type: 'POST',
+            url: actionUrl,
+            data: form.serialize(),
+            success: task => {
+                $(accordion).append(`
+                    <div id="accordion${task.pk}" class="accordion-item mb-3 w-100">
+                        <h4 class="d-flex justify-content-center accordion-header flex-grow-1" style="height: 80px">
+                            <button class="accordion-button h-100 fw-normal" type="button" data-bs-toggle="collapse"
+                            data-bs-target="#task${task.pk}" aria-expanded="true" aria-controls="${task.pk}">
+                                <span class="accordion-title">${task.title}</span>
+                            </button>
+                        </h4>
+                        <div id="task${task.pk}" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <p>${task.description}</p>
+                                <hr>
+                                <form class="d-inline" action="${task.pk}/finish-task/" method="POST">
+                                    {% csrf_token %}
+                                    <button id="toggleTask" type="submit"
+                                        class="btn btn-primary">
+                                        Finish
+                                    </button>
+                                </form>
+                                <form class="d-inline me-auto" action="${task.pk}/delete_task/" method="POST">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                                <span style="float: right">${task.date}</span>
+                            </div>
+                        </div>
+                    </div>
+                `)
+                let item = $(`#accordion${task.pk}`)[0]
+                item.addEventListener('shown.bs.collapse', () => ScrollTrigger.refresh());
+                item.addEventListener('hidden.bs.collapse', () => ScrollTrigger.refresh());
+                gsap.fromTo(item, {
+                    opacity: 0,
+                    yPercent: -100,
+                }, {
+                    opacity: 1,
+                    yPercent: 0,
+                    duration: 0.5,
+                    stagger: {
+                        each: 0.2
+                    },
+                    scrollTrigger: {
+                        start: 'bottom bottom',
+                        trigger: item,
+                        toggleActions: "restart reverse restart reverse",
+                    },
+                })
+                $('#addForm')[0].reset()
+                $('#exampleModal').modal('hide')
+
+            }
+        })
+    })
+
 </script>
 
 {% endblock content %}
