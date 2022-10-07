@@ -16,7 +16,7 @@ AJAX (Asynchronous JavaScript and XML) allows the client to communicate with the
 
 ## Implementation
 
-The implementation is a pain to say the least, especially the part where I have to figure out that using `{$ url $}` template tag with parameters inside a string literal is almost impossible (I don't know how to do it, if someone knows, please do tell me :blush:).
+The implementation is a pain to say the least, especially the part where I have to figure out that using `{% url %}` template tag with parameters inside a string literal is almost impossible (I don't know how to do it, if someone knows, please do tell me :blush:).
 
 Since I can't do that, I hardcoded the urls related to each accordion, and that works.
 
