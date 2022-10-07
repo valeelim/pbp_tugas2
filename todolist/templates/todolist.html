@@ -13,7 +13,7 @@
 <div class="container mt-5 d-flex flex-column align-items-center">
     <div class="accordion w-75" id="accordionExample">
         {% if task_list|length < 1%} <h1 class="text-center">Create a new task :D</h1>
-        {% endif %}
+            {% endif %}
     </div>
 </div>
 
@@ -67,8 +67,9 @@
     .accordion-button:not(.collapsed) {
         color: black;
     }
+
     .accordion-title {
-        display: inline-block;
+        height: 70%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -79,63 +80,135 @@
 <script>
     gsap.registerPlugin(ScrollTrigger);
 
+    const applyGsap = el_id => {
+        let item = $(`#${el_id}`)[0]
+        item.addEventListener('shown.bs.collapse', () => ScrollTrigger.refresh());
+        item.addEventListener('hidden.bs.collapse', () => ScrollTrigger.refresh());
+        gsap.fromTo(item, {
+            opacity: 0,
+            yPercent: -100,
+        }, {
+            opacity: 1,
+            yPercent: 0,
+            duration: 0.5,
+            stagger: {
+                each: 0.2
+            },
+            scrollTrigger: {
+                start: 'top bottom',
+                trigger: item,
+                toggleActions: "restart reverse restart reverse"
+            }
+        })
+    }
+
+    const applyDeleteFunction = element => {
+        element.submit(function (e) {
+            e.preventDefault()
+            let actionUrl = $(this).attr('action')
+            $.ajax({
+                type: 'POST',
+                url: actionUrl,
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success: res => {
+                    $(`#accordion${res.pk}`).remove()
+                    ScrollTrigger.refresh()
+                }
+            })
+        })
+    }
+
+    const accordionTemplate = (pk, title, description, is_finished=false, date) => {
+        return `
+            <div id="accordion${pk}" class="accordion-item mb-3 w-100">
+                <h4 class="d-flex justify-content-center accordion-header flex-grow-1" style="height: 80px">
+                    <button class="accordion-button h-100 fw-normal" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#task${pk}" aria-expanded="true" aria-controls="${pk}">
+                        <span class="accordion-title">${title}</span>
+                        ${is_finished ? `<span id="accordionBadge${pk}" class="ms-3 badge text-bg-success" style="font-size: 10px">completed</span>` : ''}
+                    </button>
+                </h4>
+                <div id="task${pk}" class="accordion-collapse collapse">
+                    <div class="accordion-body">
+                        <p style="white-space: pre-wrap">${description}</p>
+                        <hr>
+                        <form data-id='${pk}' class="finish-form d-inline" action="${pk}/finish-task/" method="POST">
+                            {% csrf_token %}
+                            <button id="toggleTask${pk}" type="submit"
+                                class="btn ${is_finished ? 'btn-warning' : 'btn-primary'}">
+                                ${is_finished ? 'Cancel' : 'Finish'}
+                            </button>
+                        </form>
+                        <form data-id=${pk} class="delete-form d-inline me-auto" action="${pk}/delete-task/" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Delete</button>
+                        </form>
+                        <span style="float: right">${date}</span>
+                    </div>
+                </div>
+            </div>
+        `
+    }
+
+    const applyCheckFunction = element => {
+        element.submit(function (e) {
+            e.preventDefault()
+            let actionUrl = $(this).attr('action')
+            $.ajax({
+                type: 'POST',
+                url: actionUrl,
+                data: {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                },
+                success: res => {
+                    if (res.currentState) {
+                        $(`button[data-bs-target='#task${res.pk}']`)
+                            .append(`<span id="accordionBadge${res.pk}" class="ms-3 badge text-bg-success" style="font-size: 10px">completed</span>`)
+                        $(`#toggleTask${res.pk}`)
+                            .html('Cancel')
+                            .removeClass('btn-primary')
+                            .addClass('btn-warning')
+                    }
+                    else {
+                        $(`#accordionBadge${res.pk}`)
+                            .remove()
+                        $(`#toggleTask${res.pk}`)
+                            .html('Finish')
+                            .removeClass('btn-warning')
+                            .addClass('btn-primary')
+                    }
+                }
+            })
+        })
+    }
+
     const accordion = document.querySelector('#accordionExample');
     $(document).ready(() => {
         $.get("{% url 'todolist:show_json' %}", data => {
             data.forEach(task => {
-                $(accordion).append(`
-                    <div id="accordion${task.pk}" class="accordion-item mb-3 w-100">
-                        <h4 class="d-flex justify-content-center accordion-header flex-grow-1" style="height: 80px">
-                            <button class="accordion-button h-100 fw-normal" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#task${task.pk}" aria-expanded="true" aria-controls="${task.pk}">
-                                <span class="accordion-title">${task.fields.title}</span>
-                                ${task.fields.is_finished ? '<span class="ms-3 badge text-bg-success" style="font-size: 10px">completed</span>' : ''}
-                            </button>
-                        </h4>
-                        <div id="task${task.pk}" class="accordion-collapse collapse">
-                            <div class="accordion-body">
-                                <p>${task.fields.description}</p>
-                                <hr>
-                                <form class="d-inline" action="${task.pk}/finish-task/" method="POST">
-                                    {% csrf_token %}
-                                    <button id="toggleTask" type="submit"
-                                        class="btn ${task.fields.is_finished ? 'btn-warning' : 'btn-primary'}">
-                                        ${task.fields.is_finished ? 'Cancel' : 'Finish'}
-                                    </button>
-                                </form>
-                                <form class="d-inline me-auto" action="${task.pk}/delete_task/" method="POST">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                </form>
-                                <span style="float: right">${task.fields.date}</span>
-                            </div>
-                        </div>
-                    </div>
-                `)
-                let item = $(`#accordion${task.pk}`)[0]
-                item.addEventListener('shown.bs.collapse', () => ScrollTrigger.refresh());
-                item.addEventListener('hidden.bs.collapse', () => ScrollTrigger.refresh());
-                gsap.fromTo(item, {
-                    opacity: 0,
-                    yPercent: -100,
-                }, {
-                    opacity: 1,
-                    yPercent: 0,
-                    duration: 0.5,
-                    stagger: {
-                        each: 0.2
-                    },
-                    scrollTrigger: {
-                        start: 'bottom bottom',
-                        trigger: item,
-                        toggleActions: "restart reverse restart reverse",
-                    },
-                })
+                $(accordion).append(accordionTemplate(
+                    task.pk,
+                    task.fields.title,
+                    task.fields.description,
+                    task.fields.is_finished,
+                    task.fields.date
+                ))
+                applyGsap(`accordion${task.pk}`)
             })
         })
+            .done(() => {
+                $('form[data-id].delete-form').each(function () {
+                    applyDeleteFunction($(this))
+                })
+                $('form[data-id].finish-form').each(function () {
+                    applyCheckFunction($(this))
+                })
+            })
     })
 
-    $('#addForm').submit(function(e) {
+    $('#addForm').submit(function (e) {
         e.preventDefault()
 
         let form = $(this)
@@ -146,59 +219,43 @@
             url: actionUrl,
             data: form.serialize(),
             success: task => {
-                $(accordion).append(`
-                    <div id="accordion${task.pk}" class="accordion-item mb-3 w-100">
-                        <h4 class="d-flex justify-content-center accordion-header flex-grow-1" style="height: 80px">
-                            <button class="accordion-button h-100 fw-normal" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#task${task.pk}" aria-expanded="true" aria-controls="${task.pk}">
-                                <span class="accordion-title">${task.title}</span>
-                            </button>
-                        </h4>
-                        <div id="task${task.pk}" class="accordion-collapse collapse">
-                            <div class="accordion-body">
-                                <p>${task.description}</p>
-                                <hr>
-                                <form class="d-inline" action="${task.pk}/finish-task/" method="POST">
-                                    {% csrf_token %}
-                                    <button id="toggleTask" type="submit"
-                                        class="btn btn-primary">
-                                        Finish
-                                    </button>
-                                </form>
-                                <form class="d-inline me-auto" action="${task.pk}/delete_task/" method="POST">
-                                    {% csrf_token %}
-                                    <button type="submit" class="btn btn-danger">Delete</button>
-                                </form>
-                                <span style="float: right">${task.date}</span>
-                            </div>
-                        </div>
-                    </div>
-                `)
-                let item = $(`#accordion${task.pk}`)[0]
-                item.addEventListener('shown.bs.collapse', () => ScrollTrigger.refresh());
-                item.addEventListener('hidden.bs.collapse', () => ScrollTrigger.refresh());
-                gsap.fromTo(item, {
-                    opacity: 0,
-                    yPercent: -100,
-                }, {
-                    opacity: 1,
-                    yPercent: 0,
-                    duration: 0.5,
-                    stagger: {
-                        each: 0.2
-                    },
-                    scrollTrigger: {
-                        start: 'bottom bottom',
-                        trigger: item,
-                        toggleActions: "restart reverse restart reverse",
-                    },
-                })
-                $('#addForm')[0].reset()
+                $(accordion).append(accordionTemplate(
+                    task.pk,
+                    task.title,
+                    task.description,
+                    task.is_finished,
+                    task.date
+                ))
+                applyGsap(`accordion${task.pk}`)
+                applyDeleteFunction($(`form[data-id=${task.pk}].delete-form`))
+                applyCheckFunction($(`form[data-id=${task.pk}].finish-form`))
                 $('#exampleModal').modal('hide')
-
             }
         })
     })
+
+    // MEDIA QUERY FOR BUTTONS
+    const func = screen => {
+        if (screen.matches) {
+            $('form[data-id] button').each(function() {
+                $(this).addClass('btn-sm')
+            })
+            $(`span[id^='accordionBadge'`).each(function() {
+                $(this).addClass('me-3')
+            })
+        }
+        else {
+            $('form[data-id] button').each(function() {
+                $(this).removeClass('btn-sm')
+            })
+            $(`span[id^='accordionBadge'`).each(function() {
+                $(this).removeClass('me-3')
+            })
+        }
+    }
+    let screen = window.matchMedia('(max-width: 990px)')
+    func(screen)
+    screen.addListener(func)
 
 </script>
 

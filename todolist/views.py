@@ -32,15 +32,16 @@ class IndexView(LoginRequiredMixin, generic.ListView):
         })
         return context
 
+
 def show_json(request):
     data = Task.objects.all()
     return HttpResponse(serializers.serialize('json', data), content_type='application/json')
+
 
 def create_task(request):
     if request.method == 'POST':
         newTask = Task(
             user=request.user,
-            date=datetime.datetime.now(),
             title=request.POST.get('title'),
             description=request.POST.get('description'),
         )
@@ -57,7 +58,9 @@ def create_task(request):
 def delete_task(request, task_id):
     if request.method == 'POST':
         Task.objects.get(pk=task_id).delete()
-        return HttpResponseRedirect(reverse('todolist:show_todolist'))
+        return JsonResponse({
+            'pk': task_id
+        })
 
 
 def finish_task(request, task_id):
@@ -65,7 +68,10 @@ def finish_task(request, task_id):
         task = Task.objects.get(pk=task_id)
         task.is_finished ^= True
         task.save()
-        return HttpResponseRedirect(reverse('todolist:show_todolist'))
+        return JsonResponse({
+            'pk': task.pk,
+            'currentState': task.is_finished
+        })
 
 
 def register(request):
